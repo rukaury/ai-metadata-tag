@@ -8,7 +8,7 @@ import { stdout } from "process";
 import {fromIni} from '@aws-sdk/credential-providers';
 
 // Set the AWS Region.
-const REGION = "region-name"; //e.g. "us-east-1"
+const REGION = "us-east-2";
 const profileName = "profile-name"
 // Create SNS service object.
 const sqsClient = new SQSClient({ region: REGION, 
@@ -20,7 +20,7 @@ const rekClient = new RekognitionClient({region: REGION,
 });
 
 // Set bucket and video variables
-const bucket = "bucket-name";
+const bucket = "ai-metadata-tagging";
 const videoName = "video-name";
 const roleArn = "role-arn"
 var startJobId = ""
