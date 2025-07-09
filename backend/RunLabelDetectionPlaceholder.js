@@ -71,7 +71,7 @@ const getEndingTimestamps = async(tagDataList, videoLength) => {
 
 // Start label detection job, sent status notification, check for success status
 // Retrieve results if status is "SUCEEDED", delete notification queue and topic
-const runLabelDetectionAndGetResults = async () => {
+export const runLabelDetectionAndGetResults = async () => {
   const results = await getLabelDetectionResults();
   console.log(results);
   return results;

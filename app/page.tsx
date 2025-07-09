@@ -27,9 +27,10 @@ import {
 import ReactPlayer from "react-player";
 
 interface Tag {
-  label: string;
-  start: number;
-  end: number;
+  tagName: string;
+  startTime: number;
+  endTime: number;
+  confidence: number;
 }
 
 const HomePage: React.FC = () => {
@@ -37,13 +38,26 @@ const HomePage: React.FC = () => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
-  const [tags, setTags] = useState<Tag[]>([
-    { label: "Goal", start: 0, end: 3 },
-    { label: "Pass", start: 3, end: 6 },
-    { label: "Crowd Reaction", start: 12, end: 19 },
-    { label: "Interview", start: 20, end: 25 },
-  ]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [isDetecting, setIsDetecting] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+
+  const handleDetectLabels = async () => {
+    setIsDetecting(true);
+    try {
+      const response = await fetch("/api/detect-labels");
+      if (!response.ok) {
+        throw new Error("Failed to fetch labels");
+      }
+      const newTags = await response.json();
+      console.log("wowwowwowwowwowwowwow");
+      setTags(newTags);
+    } catch (error) {
+      console.error("Error detecting labels:", error);
+    } finally {
+      setIsDetecting(false);
+    }
+  };
 
   const jumpToTimestamp = (seconds: number) => {
     if (mediaControllerRef.current?.media) {
@@ -82,7 +96,10 @@ const HomePage: React.FC = () => {
 
       setUploadedFileName(key);
     } catch (err) {
-      console.error("Upload failed:", err);
+      console.error("Upload failed silently:", err);
+    } finally {
+      // Always trigger label detection after attempting upload
+      await handleDetectLabels();
     }
   };
 
@@ -151,7 +168,7 @@ const HomePage: React.FC = () => {
               />
               {duration > 0 &&
                 tags.map((tag, idx) => {
-                  const left = (tag.start / duration) * 100;
+                  const left = (tag.startTime / duration) * 100;
                   return (
                     <div
                       key={idx}
@@ -159,10 +176,10 @@ const HomePage: React.FC = () => {
                       style={{
                         left: `${left}%`,
                       }}
-                      onClick={() => jumpToTimestamp(tag.start)}
-                      title={`${tag.label}: ${formatTime(tag.start)}`}
+                      onClick={() => jumpToTimestamp(tag.startTime)}
+                      title={`${tag.tagName}: ${formatTime(tag.startTime)}`}
                     >
-                      <div className="tag-label">{tag.label}</div>
+                      <div className="tag-label">{tag.tagName}</div>
                     </div>
                   );
                 })}
@@ -171,13 +188,13 @@ const HomePage: React.FC = () => {
             <div className="buttons">
               <Button label="Live Feed" />
               <FileUpload
-                mode="basic"
                 name="video"
+                mode="basic"
                 accept="video/*"
-                chooseLabel="Upload Video"
                 customUpload
-                auto
                 uploadHandler={handleCustomUpload}
+                auto
+                chooseLabel="Upload Video"
               />
             </div>
           </div>
@@ -189,12 +206,12 @@ const HomePage: React.FC = () => {
               {tags.map((tag, idx) => (
                 <li key={idx}>
                   <strong
-                    onClick={() => jumpToTimestamp(tag.start)}
-                    title={`Jump to ${formatTime(tag.start)}`}
+                    onClick={() => jumpToTimestamp(tag.startTime)}
+                    title={`Jump to ${formatTime(tag.startTime)}`}
                   >
-                    {tag.label}
+                    {tag.tagName}
                   </strong>
-                  : {formatTime(tag.start)} - {formatTime(tag.end)}
+                  : {formatTime(tag.startTime)} - {formatTime(tag.endTime)}
                 </li>
               ))}
             </ul>
