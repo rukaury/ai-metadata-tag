@@ -50,9 +50,9 @@ const getLabelDetectionResults = async() => {
   var tagDataList = [];
 
   // Begin retrieving label detection results
-  for (let i = 1; i < 6; i++)
+  for (let i = 0; i < 5; i++)
   {
-    tagDataList.push(new TagData("Tag " + i, i*10, (i*10)+10, 100.00));
+    tagDataList.push(new TagData("Tag " + (i+1), i*10, (i*10)+10, 100.00));
   }
 
   return tagDataList;
