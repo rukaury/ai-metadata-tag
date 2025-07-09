@@ -230,6 +230,8 @@ const runLabelDetectionAndGetResults = async () => {
     const deleteQueue = await sqsClient.send(new DeleteQueueCommand({QueueUrl: sqsAndTopic[0]}));
     const deleteTopic = await snsClient.send(new DeleteTopicCommand({TopicArn: sqsAndTopic[1]}));
     console.log("Successfully deleted.")
+
+    console.log(results);
   } catch (err) {
     console.log("Error", err);
   }
