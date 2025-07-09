@@ -104,6 +104,8 @@ const getLabelDetectionResults = async(startJobId) => {
   var paginationToken = ''
   var finished = false
 
+  var tagDataList = [];
+
   // Begin retrieving label detection results
   while (finished == false){
     var response = await rekClient.send(new GetLabelDetectionCommand({JobId: startJobId, MaxResults: maxResults, 
@@ -120,7 +122,11 @@ const getLabelDetectionResults = async(startJobId) => {
         console.log(`Timestamp: ${labelDetection.Timestamp}`)
         console.log(`Label: ${label.Name}`)
         console.log(`Confidence: ${label.Confidence}`)
-        console.log("Instances:")
+        console.log("Instances:")        
+
+        // TODO create end time stamps properly
+        tagDataList.push(new TagData(label.Name, labelDetection.Timestamp, labelDetection.Timestamp, label.Confidence));
+
         label.Instances.forEach(instance =>{
           console.log(`Confidence: ${instance.Confidence}`)
           console.log("Bounding Box:")
@@ -147,6 +153,8 @@ const getLabelDetectionResults = async(startJobId) => {
 
       })
   }
+
+  return tagDataList;
 }
 
 // Checks for status of job completion
@@ -224,6 +232,8 @@ const runLabelDetectionAndGetResults = async () => {
   } catch (err) {
     console.log("Error", err);
   }
+
+  return results;
 };
 
 runLabelDetectionAndGetResults()
