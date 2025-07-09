@@ -42,17 +42,28 @@ const sqsParams = {
 
 const getLabelDetectionResults = async() => {
   console.log("Retrieving Label Detection results")
-  // Set max results, paginationToken and finished will be updated depending on response values
-  var maxResults = 10
-  var paginationToken = ''
-  var finished = false
-
+  var videoLength = 60;
   var tagDataList = [];
 
   // Begin retrieving label detection results
   for (let i = 0; i < 5; i++)
   {
-    tagDataList.push(new TagData("Tag " + (i+1), i*10, (i*10)+10, 100.00));
+    tagDataList.push(new TagData("Tag " + (i+1), i*10, null, 100.00));
+  }
+
+  tagDataList = getEndingTimestamps(tagDataList, videoLength);
+
+  return tagDataList;
+}
+
+// Generate ending timestamps from next tagData's start time
+const getEndingTimestamps = async(tagDataList, videoLength) => {
+  var endTimestamp = videoLength;
+
+  for (let i = tagDataList.length - 1; i >= 0; i--)
+  {
+    tagDataList[i].endTime = endTimestamp;
+    endTimestamp = tagDataList[i].startTime;
   }
 
   return tagDataList;
