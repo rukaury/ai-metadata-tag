@@ -4,6 +4,7 @@
 import { ThemeProvider } from "next-themes";
 import "primeicons/primeicons.css";
 import { Button } from "primereact/button";
+import { FileUpload } from "primereact/fileupload";
 import { Panel } from "primereact/panel";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -38,6 +39,10 @@ const HomePage: React.FC = () => {
     { label: "Crowd Reaction", start: "0:30", end: "0:45", pos: 40 },
     { label: "Interview", start: "0:45", end: "1:30", pos: 75 },
   ]);
+  const [uploadVisible, setUploadVisible] = useState(false);
+  const handleUploadClick = () => {
+    setUploadVisible(true);
+  };
 
   return (
     <ThemeProvider defaultTheme="light" enableSystem={false}>
@@ -72,8 +77,16 @@ const HomePage: React.FC = () => {
           </MediaController>
 
           <div className="buttons">
-            <Button label="Live Feed" className="p-button-outlined" />
-            <Button label="Upload Video" className="p-button-outlined" />
+            <Button label="Live Feed" className="p-2" />
+            <FileUpload
+              mode="basic"
+              name="video"
+              accept="video/*"
+              chooseLabel="Upload Video"
+              customUpload
+              auto
+              className="p-2"
+            />
           </div>
         </div>
 
