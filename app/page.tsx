@@ -1,95 +1,66 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+// app/page.tsx
+"use client";
 
-export default function Home() {
+import "primeicons/primeicons.css";
+import { Button } from "primereact/button";
+import { Panel } from "primereact/panel";
+import "primereact/resources/primereact.min.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import React, { useState } from "react";
+import "./globals.css";
+
+interface Tag {
+  label: string;
+  start: string;
+  end: string;
+  pos: number;
+}
+
+const HomePage: React.FC = () => {
+  const [tags, setTags] = useState<Tag[]>([
+    { label: "Goal", start: "0:00", end: "0:30", pos: 10 },
+    { label: "Crowd Reaction", start: "0:30", end: "0:45", pos: 40 },
+    { label: "Interview", start: "0:45", end: "1:30", pos: 75 },
+  ]);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="app">
+      <div className="video-section">
+        <Panel header="Video Player">
+          <div className="video-placeholder">Video</div>
+          <div className="timeline">
+            {tags.map((tag, idx) => (
+              <div
+                key={idx}
+                className="tag-marker"
+                style={{ left: `${tag.pos}%` }}
+              >
+                <div className="tag-label">{tag.label}</div>
+              </div>
+            ))}
+            <div className="progress-line"></div>
+          </div>
+        </Panel>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+        <div className="buttons">
+          <Button label="Live Feed" className="p-button-outlined" />
+          <Button label="Upload Video" className="p-button-outlined" />
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      <div className="metadata-feed">
+        <Panel header="Metadata Feed">
+          <ul>
+            {tags.map((tag, idx) => (
+              <li key={idx}>
+                <strong>{tag.label}</strong>: {tag.start} - {tag.end}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
     </div>
   );
-}
+};
+
+export default HomePage;
