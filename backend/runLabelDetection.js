@@ -9,7 +9,7 @@ import {fromIni} from '@aws-sdk/credential-providers';
 
 // Set the AWS Region.
 const REGION = "us-east-2";
-const profileName = "profile-name"
+const profileName = "851725444885_hackathon"
 // Create SNS service object.
 const sqsClient = new SQSClient({ region: REGION, 
   credentials: fromIni({profile: profileName,}), });
@@ -20,9 +20,9 @@ const rekClient = new RekognitionClient({region: REGION,
 });
 
 // Set bucket and video variables
-const bucket = "ai-metadata-tagging";
-const videoName = "video-name";
-const roleArn = "role-arn"
+const bucket = "ai-metadata-tagging-2";
+const videoName = "videoplayback.mp4";
+const roleArn = "arn:aws:iam::851725444885:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_hackathon_c658c79ed1229579"
 var startJobId = ""
 
 var ts = Date.now();
