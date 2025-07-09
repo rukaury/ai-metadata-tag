@@ -7,7 +7,7 @@ import { Button } from "primereact/button";
 import { Panel } from "primereact/panel";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./globals.css";
 
 import {
@@ -27,23 +27,40 @@ import ReactPlayer from "react-player";
 
 interface Tag {
   label: string;
-  start: string;
-  end: string;
+  start: number;
+  end: number;
   pos: number;
 }
 
 const HomePage: React.FC = () => {
+  const mediaControllerRef = useRef<any>(null);
+
   const [tags, setTags] = useState<Tag[]>([
-    { label: "Goal", start: "0:00", end: "0:30", pos: 10 },
-    { label: "Crowd Reaction", start: "0:30", end: "0:45", pos: 40 },
-    { label: "Interview", start: "0:45", end: "1:30", pos: 75 },
+    { label: "Goal", start: 0, end: 30, pos: 10 },
+    { label: "Crowd Reaction", start: 10, end: 45, pos: 40 },
+    { label: "Interview", start: 20, end: 90, pos: 75 },
   ]);
+
+  const jumpToTimestamp = (seconds: number) => {
+    if (mediaControllerRef.current?.media) {
+      mediaControllerRef.current.media.currentTime = seconds;
+    }
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
 
   return (
     <ThemeProvider defaultTheme="light" enableSystem={false}>
       <div className="app">
         <div className="video-section">
           <MediaController
+            ref={mediaControllerRef}
             style={{
               width: "100%",
               aspectRatio: "16/9",
@@ -57,7 +74,7 @@ const HomePage: React.FC = () => {
                 width: "100%",
                 height: "100%",
               }}
-            ></ReactPlayer>
+            />
             <MediaControlBar>
               <MediaPlayButton />
               <MediaSeekBackwardButton seekOffset={10} />
@@ -82,7 +99,14 @@ const HomePage: React.FC = () => {
             <ul>
               {tags.map((tag, idx) => (
                 <li key={idx}>
-                  <strong>{tag.label}</strong>: {tag.start} - {tag.end}
+                  <strong
+                    onClick={() => jumpToTimestamp(tag.start)}
+                    style={{ cursor: "pointer", color: "#2196f3" }}
+                    title={`Jump to ${formatTime(tag.start)}`}
+                  >
+                    {tag.label}
+                  </strong>
+                  : {formatTime(tag.start)} - {formatTime(tag.end)}
                 </li>
               ))}
             </ul>
