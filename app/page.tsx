@@ -30,16 +30,18 @@ interface Tag {
   label: string;
   start: number;
   end: number;
-  pos: number;
 }
 
 const HomePage: React.FC = () => {
   const mediaControllerRef = useRef<any>(null);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const [tags, setTags] = useState<Tag[]>([
-    { label: "Goal", start: 0, end: 30, pos: 10 },
-    { label: "Crowd Reaction", start: 10, end: 45, pos: 40 },
-    { label: "Interview", start: 20, end: 90, pos: 75 },
+    { label: "Goal", start: 0, end: 3 },
+    { label: "Pass", start: 3, end: 6 },
+    { label: "Crowd Reaction", start: 12, end: 19 },
+    { label: "Interview", start: 20, end: 25 },
   ]);
   const [uploadVisible, setUploadVisible] = useState(false);
   const handleUploadClick = () => {
@@ -49,6 +51,7 @@ const HomePage: React.FC = () => {
   const jumpToTimestamp = (seconds: number) => {
     if (mediaControllerRef.current?.media) {
       mediaControllerRef.current.media.currentTime = seconds;
+      mediaControllerRef.current.media.play();
     }
   };
 
@@ -60,50 +63,99 @@ const HomePage: React.FC = () => {
     return `${minutes}:${seconds}`;
   };
 
+  const setMediaControllerRef = (element: any) => {
+    mediaControllerRef.current = element;
+    if (element?.media) {
+      const media = element.media;
+      const handleLoadedMetadata = () => {
+        if (media.duration && media.duration !== Infinity) {
+          setDuration(media.duration);
+        }
+      };
+      const handleTimeUpdate = () => {
+        setCurrentTime(media.currentTime);
+      };
+
+      media.addEventListener("loadedmetadata", handleLoadedMetadata);
+      media.addEventListener("timeupdate", handleTimeUpdate);
+
+      if (media.readyState >= 1) {
+        handleLoadedMetadata();
+      }
+    }
+  };
+
   return (
-    <ThemeProvider defaultTheme="light" enableSystem={false}>
+    <ThemeProvider attribute="data-theme" defaultTheme="light">
       <div className="app">
         <div className="video-section">
-          <MediaController
-            ref={mediaControllerRef}
-            style={{
-              width: "100%",
-              aspectRatio: "16/9",
-            }}
-          >
-            <ReactPlayer
-              slot="media"
-              src="https://stream.mux.com/maVbJv2GSYNRgS02kPXOOGdJMWGU1mkA019ZUjYE7VU7k"
-              controls={false}
+          <div className="video-player-container">
+            <MediaController
+              ref={setMediaControllerRef}
+              className="media-controller"
               style={{
-                width: "100%",
-                height: "100%",
+                aspectRatio: "16 / 9",
               }}
-            />
-            <MediaControlBar>
-              <MediaPlayButton />
-              <MediaSeekBackwardButton seekOffset={10} />
-              <MediaSeekForwardButton seekOffset={10} />
-              <MediaTimeRange />
-              <MediaTimeDisplay showDuration />
-              <MediaMuteButton />
-              <MediaVolumeRange />
-              <MediaPlaybackRateButton />
-              <MediaFullscreenButton />
-            </MediaControlBar>
-          </MediaController>
+            >
+              <ReactPlayer
+                slot="media"
+                src="https://stream.mux.com/maVbJv2GSYNRgS02kPXOOGdJMWGU1mkA019ZUjYE7VU7k"
+                controls={false}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+              <MediaControlBar>
+                <MediaPlayButton />
+                <MediaSeekBackwardButton seekOffset={10} />
+                <MediaSeekForwardButton seekOffset={10} />
+                <MediaTimeRange />
+                <MediaTimeDisplay showDuration />
+                <MediaMuteButton />
+                <MediaVolumeRange />
+                <MediaPlaybackRateButton />
+                <MediaFullscreenButton />
+              </MediaControlBar>
+            </MediaController>
+          </div>
 
-          <div className="buttons">
-            <Button label="Live Feed" className="p-2" />
-            <FileUpload
-              mode="basic"
-              name="video"
-              accept="video/*"
-              chooseLabel="Upload Video"
-              customUpload
-              auto
-              className="p-2"
-            />
+          <div className="controls-section">
+            <div className="timeline">
+              <div
+                className="timeline-progress"
+                style={{ width: `${(currentTime / duration) * 100}%` }}
+              />
+              {duration > 0 &&
+                tags.map((tag, idx) => {
+                  const left = (tag.start / duration) * 100;
+                  return (
+                    <div
+                      key={idx}
+                      className="tag-marker"
+                      style={{
+                        left: `${left}%`,
+                      }}
+                      onClick={() => jumpToTimestamp(tag.start)}
+                      title={`${tag.label}: ${formatTime(tag.start)}`}
+                    >
+                      <div className="tag-label">{tag.label}</div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div className="buttons">
+              <Button label="Live Feed" />
+              <FileUpload
+                mode="basic"
+                name="video"
+                accept="video/*"
+                chooseLabel="Upload Video"
+                customUpload
+                auto
+              />
+            </div>
           </div>
         </div>
 
@@ -114,7 +166,6 @@ const HomePage: React.FC = () => {
                 <li key={idx}>
                   <strong
                     onClick={() => jumpToTimestamp(tag.start)}
-                    style={{ cursor: "pointer", color: "#2196f3" }}
                     title={`Jump to ${formatTime(tag.start)}`}
                   >
                     {tag.label}
