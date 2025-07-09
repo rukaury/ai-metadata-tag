@@ -58,7 +58,7 @@ const getLabelDetectionResultsHardcoded = async() => {
 
 const getLabelDetectionResults = async() => {
   console.log("Retrieving Label Detection results")
-  var videoLength = 30;
+  var videoLength = 25;
   var tagDataList = [];
 
   // Begin retrieving label detection results
