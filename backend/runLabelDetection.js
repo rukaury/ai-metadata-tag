@@ -10,7 +10,7 @@ import TagData from "./TagData.js";
 
 // Set the AWS Region.
 const REGION = "us-east-2";
-const profileName = "851725444885_hackathon"
+const profileName = "default"
 // Create SNS service object.
 const sqsClient = new SQSClient({ region: REGION, 
   credentials: fromIni({profile: profileName,}), });
@@ -22,7 +22,7 @@ const rekClient = new RekognitionClient({region: REGION,
 
 // Set bucket and video variables
 const bucket = "ai-metadata-tagging-2";
-const videoName = "videoplayback.mp4";
+const videoName = "5seconds.mp4";
 const roleArn = "arn:aws:iam::851725444885:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_hackathon_c658c79ed1229579"
 var startJobId = ""
 
@@ -218,15 +218,15 @@ const getSQSMessageSuccess = async(sqsQueueUrl, startJobId) => {
 // Start label detection job, sent status notification, check for success status
 // Retrieve results if status is "SUCEEDED", delete notification queue and topic
 const runLabelDetectionAndGetResults = async () => {
+
+  var results = [];
+  
   try {
     const sqsAndTopic = await createTopicandQueue();
     const startLabelDetectionRes = await startLabelDetection(roleArn, sqsAndTopic[1]);
-    const getSQSMessageStatus = await getSQSMessageSuccess(sqsAndTopic[0], startLabelDetectionRes)
-    console.log(getSQSMessageSuccess)
-    if (getSQSMessageSuccess){
-      console.log("Retrieving results:")
-      const results = await getLabelDetectionResults(startLabelDetectionRes)
-    }
+    await new Promise(resolve => setTimeout(resolve, 30000));
+    console.log("Retrieving results:")
+    results = await getLabelDetectionResults(startLabelDetectionRes)
     const deleteQueue = await sqsClient.send(new DeleteQueueCommand({QueueUrl: sqsAndTopic[0]}));
     const deleteTopic = await snsClient.send(new DeleteTopicCommand({TopicArn: sqsAndTopic[1]}));
     console.log("Successfully deleted.")

@@ -40,15 +40,31 @@ const sqsParams = {
   },
 };
 
-const getLabelDetectionResults = async() => {
+const getLabelDetectionResultsHardcoded = async() => {
   console.log("Retrieving Label Detection results")
-  var videoLength = 60;
+  var videoLength = 30;
   var tagDataList = [];
 
   // Begin retrieving label detection results
   for (let i = 0; i < 5; i++)
   {
     tagDataList.push(new TagData("Tag " + (i+1), i*10, null, 100.00));
+  }
+
+  tagDataList = getEndingTimestamps(tagDataList, videoLength);
+
+  return tagDataList;
+}
+
+const getLabelDetectionResults = async() => {
+  console.log("Retrieving Label Detection results")
+  var videoLength = 30;
+  var tagDataList = [];
+
+  // Begin retrieving label detection results
+  for (let i = 0; i < 5; i++)
+  {
+    tagDataList.push(new TagData("Tag " + (i+1), i*5, null, 100.00));
   }
 
   tagDataList = getEndingTimestamps(tagDataList, videoLength);
