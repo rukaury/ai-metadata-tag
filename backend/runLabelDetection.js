@@ -6,6 +6,7 @@ import  { SNSClient } from "@aws-sdk/client-sns";
 import  { RekognitionClient, StartLabelDetectionCommand, GetLabelDetectionCommand } from "@aws-sdk/client-rekognition";
 import { stdout } from "process";
 import {fromIni} from '@aws-sdk/credential-providers';
+import TagData from "./TagData.js";
 
 // Set the AWS Region.
 const REGION = "us-east-2";
