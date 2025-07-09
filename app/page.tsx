@@ -9,6 +9,21 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import React, { useState } from "react";
 import "./globals.css";
 
+import {
+  MediaControlBar,
+  MediaController,
+  MediaFullscreenButton,
+  MediaMuteButton,
+  MediaPlaybackRateButton,
+  MediaPlayButton,
+  MediaSeekBackwardButton,
+  MediaSeekForwardButton,
+  MediaTimeDisplay,
+  MediaTimeRange,
+  MediaVolumeRange,
+} from "media-chrome/react";
+import ReactPlayer from "react-player";
+
 interface Tag {
   label: string;
   start: string;
@@ -26,21 +41,33 @@ const HomePage: React.FC = () => {
   return (
     <div className="app">
       <div className="video-section">
-        <Panel header="Video Player">
-          <div className="video-placeholder">Video</div>
-          <div className="timeline">
-            {tags.map((tag, idx) => (
-              <div
-                key={idx}
-                className="tag-marker"
-                style={{ left: `${tag.pos}%` }}
-              >
-                <div className="tag-label">{tag.label}</div>
-              </div>
-            ))}
-            <div className="progress-line"></div>
-          </div>
-        </Panel>
+        <MediaController
+          style={{
+            width: "100%",
+            aspectRatio: "16/9",
+          }}
+        >
+          <ReactPlayer
+            slot="media"
+            src="https://stream.mux.com/maVbJv2GSYNRgS02kPXOOGdJMWGU1mkA019ZUjYE7VU7k"
+            controls={false}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          ></ReactPlayer>
+          <MediaControlBar>
+            <MediaPlayButton />
+            <MediaSeekBackwardButton seekOffset={10} />
+            <MediaSeekForwardButton seekOffset={10} />
+            <MediaTimeRange />
+            <MediaTimeDisplay showDuration />
+            <MediaMuteButton />
+            <MediaVolumeRange />
+            <MediaPlaybackRateButton />
+            <MediaFullscreenButton />
+          </MediaControlBar>
+        </MediaController>
 
         <div className="buttons">
           <Button label="Live Feed" className="p-button-outlined" />
