@@ -4,11 +4,11 @@
 import { ThemeProvider } from "next-themes";
 import "primeicons/primeicons.css";
 import { Button } from "primereact/button";
-import { FileUpload } from "primereact/fileupload";
+import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { Panel } from "primereact/panel";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import "./globals.css";
 
 import {
@@ -41,10 +41,7 @@ const HomePage: React.FC = () => {
     { label: "Crowd Reaction", start: 10, end: 45, pos: 40 },
     { label: "Interview", start: 20, end: 90, pos: 75 },
   ]);
-  const [uploadVisible, setUploadVisible] = useState(false);
-  const handleUploadClick = () => {
-    setUploadVisible(true);
-  };
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   const jumpToTimestamp = (seconds: number) => {
     if (mediaControllerRef.current?.media) {
@@ -58,6 +55,32 @@ const HomePage: React.FC = () => {
       .toString()
       .padStart(2, "0");
     return `${minutes}:${seconds}`;
+  };
+
+  const handleCustomUpload = async (event: FileUploadHandlerEvent) => {
+    const file = event.files[0];
+    const fileName = encodeURIComponent(file.name);
+
+    try {
+      // Step 1: Get signed URL from your backend
+      const res = await fetch(
+        `/api/upload-url?fileName=${fileName}&fileType=${file.type}`
+      );
+      const { url, key } = await res.json();
+
+      // Step 2: Upload the file directly to S3
+      await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      setUploadedFileName(key);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
   };
 
   return (
@@ -103,6 +126,7 @@ const HomePage: React.FC = () => {
               customUpload
               auto
               className="p-2"
+              uploadHandler={handleCustomUpload}
             />
           </div>
         </div>
